@@ -2,6 +2,6 @@
 npm run test
 
 ## Gerar codigo developer
-npm run webpack
+'npm run webpack'
 Em outra aba do terminal
-npm start
+'npm start'
