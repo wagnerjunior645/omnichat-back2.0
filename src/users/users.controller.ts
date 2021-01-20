@@ -2,13 +2,14 @@ import { Router } from "express";
 import { Request, Response } from "express";
 import { celebrate, Segments, Joi } from "celebrate";
 import { CreateUsers } from "./models/createUsers.model";
-import { FakeRepository } from "../config/fake.repository";
+import { UsersService } from "./users.service";
+import { authGuard } from "../auth/authGuard.controller";
 
 const usersRouters = Router();
 
 usersRouters.get("", async (req: Request, res: Response) => {
-  const fakeRepository = new FakeRepository();
-  const users = await fakeRepository.findAll();
+  const usersService = new UsersService();
+  const users = await usersService.findAll();
   res.json(users);
 });
 usersRouters.delete(
@@ -20,29 +21,26 @@ usersRouters.delete(
   }),
   async (req: Request, res: Response) => {
     const id: number = Number(req.params.id);
-    const fakeRepository = new FakeRepository();
+    const usersService = new UsersService();
     try {
-      await fakeRepository.remove(id);
+      await usersService.remove(id);
       res.status(204).send();
     } catch (err) {
       res.status(400).json({ error: err.message });
     }
   }
 );
-usersRouters.put(
-  "/:id",
-  async (req: Request, res: Response) => {
-    const { user } = req.body;
-    const id: number = Number(req.params.id);
-    const fakeRepository = new FakeRepository();
-    try {
-      await fakeRepository.update(id, user);
-      res.status(204).send();
-    } catch (err) {
-      res.status(400).json({ error: err.message });
-    }
+usersRouters.put("/:id", async (req: Request, res: Response) => {
+  const { user } = req.body;
+  const id: number = Number(req.params.id);
+  const usersService = new UsersService();
+  try {
+    await usersService.update(id, user);
+    res.status(204).send();
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
-);
+});
 usersRouters.post(
   "",
   celebrate({
@@ -52,16 +50,17 @@ usersRouters.post(
     },
   }),
   async (req: Request, res: Response) => {
-    const fakeRepository = new FakeRepository();
+    const usersService = new UsersService();
     const body = req.body as CreateUsers;
     try {
-      const createdUser = await fakeRepository.create(body.user, body.password);
+      const createdUser = await usersService.create(body.user, body.password);
       res.status(201).json(createdUser);
     } catch (err) {
       res.status(400).json({ error: err.message });
     }
   }
 );
+usersRouters.use(authGuard);
 usersRouters.get(
   "/:id",
   celebrate({
@@ -69,11 +68,11 @@ usersRouters.get(
       id: Joi.number().required(),
     },
   }),
-  async (req: Request, res: Response) => {
+  async (req: any, res: Response) => {
     const id: number = Number(req.params.id);
-    const fakeRepository = new FakeRepository();
+    const usersService = new UsersService();
     try {
-      const findUser = await fakeRepository.find(id);
+      const findUser = await usersService.find(id);
       res.status(200).json(findUser);
     } catch (err) {
       res.status(400).json({ error: err.message });

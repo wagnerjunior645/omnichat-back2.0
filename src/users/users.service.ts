@@ -11,6 +11,9 @@ export class UsersService {
   async find(id: number): Promise<Users> {
     return this.fakeRepository.find(id);
   }
+  async findByUsername(username: string): Promise<Users> {
+    return this.fakeRepository.findByUsername(username);
+  }
   async create(user: string, password: string): Promise<Users> {
     return this.fakeRepository.create(user, password);
   }

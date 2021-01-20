@@ -11,6 +11,13 @@ export class FakeRepository {
     }
     return findUser;
   }
+  async findByUsername(username: string): Promise<Users> {
+    const findUser = users.find((user) => user.user === username);
+    if (!findUser) {
+      throw new Error("Usuário não existe.");
+    }
+    return findUser;
+  }
   async create(user: string, password: string): Promise<Users> {
     const id = Date.now();
     const createUser = { id, user, password };
